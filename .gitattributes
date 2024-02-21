@@ -1,2 +1,128 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+import pyttsx3
+import speech_recognition as sr
+import datetime
+from datetime import date
+import wikipedia
+import pyaudio
+import webbrowser
+import os
+import smtplib
+engine = pyttsx3.init('sapi5')
+voices = engine.getProperty('voices')
+print(voices[0].id)
+engine.setProperty('voices',voices[0].id)
+
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+def wishMe():
+    hour = int(datetime.datetime.now().hour)
+    if hour>=0 and hour<12:
+        speak("Good morning!")
+
+    elif hour>=12 and hour<18:
+        speak("Good afternoon")
+    
+    else:
+        speak("Good Evening!")
+
+    speak("I am your personal assistant, please tell me how may I help you?")
+
+def takeCommand():
+    #It takes the input from the user and returns string output.
+
+    r=sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        audio = r.listen(source)
+
+
+    try:
+        print("Recognizing...")
+        query =  r.recognize_google(audio, language='en-In')
+        print("User said:", query)
+
+    except Exception as e:
+        #d print(e)
+
+        print("Say that again please..")
+        return "None"
+    return query   
+
+def sendEmail(to, content):
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login('architag35@gmail.com', 'vreuazxehfokkpbs')
+    #server.sendmail('architag35@gmail.com',to,content)
+    #server.sendmail('architag35@gmail.com',to,content)
+    #server.sendmail('architag35@gmail.com',to,content)
+
+
+if __name__=="__main__":
+    wishMe()
+ ## To define the comman commands-----
+    while True:
+        query = takeCommand().lower()
+        if 'wikipedia' in query:
+            speak('Searching Wikipedia...')
+            query = query.replace("wikipedia","")
+            results = wikipedia.summary(query, sentences=2)
+            speak("According to wikipedia")
+            speak(results)
+            print(results)
+# Using Web browser-----------------------------------
+        elif 'open youtube' in query:
+            webbrowser.open("Youtube.com")
+
+        elif 'open stack overflow' in query:
+            webbrowser.open('stackoverflow.com')
+
+        elif 'open vtop' in query:
+            webbrowser.open('https://vtop.vit.ac.in/vtop/login')
+
+        elif 'movie' in query:
+            speak("Opening prime video, you can choose your preffered movie after.")
+            webbrowser.open('https://www.primevideo.com/?ref_=dvm_pds_amz_in_as_s_gm_16&gclid=CjwKCAiA76-dBhByEiwAA0_s9YBEey2GlZvq3aVoxtX6jkcBqG-8CWAW8Lzc69469S43llGZeqfMkxoCuMoQAvD_BwE')
+ # To tell the date and time------------------------------------       
+        elif 'the time' in query:
+            strTime = datetime.datetime.now().strftime("%H:%M:%S")
+            speak(f"The time is {strTime}")
+        elif 'date' in query:
+            today = date.today()
+            speak(f"Today's ddate is {today}")
+              
+# To open appllications--------------------------------
+        elif 'program' in query:
+            codepath1 = "C:\\Users\\archi\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"
+            os.startfile(codepath1)
+
+        elif 'matlab' in query:
+            codepath2 = "C:\\Program Files\\MATLAB\R2022b\\bin\\matlab.exe"
+            os.startfile(codepath2)
+
+# To play music
+        elif 'play some music' in query:    
+                    music_dir = "C:\\Users\\archi\\OneDrive\\Desktop\\music"
+                    songs = os.listdir(music_dir)
+                    print(songs)
+                    os.startfile(os.path.join(music_dir,songs[0]))
+
+#To send EMail
+        elif 'mail to archit' in query:
+            speak("What should I send?")
+            try:
+                contact = takeCommand()
+                to = "architag35@gmail.com"
+                sendEmail(to,content)
+                speak("Email has been sent!")
+            except Exception as e:
+                print(e)
+                speak("Sorry, I am not able send this email.")
+
+
+
+        
